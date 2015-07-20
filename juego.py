@@ -10,10 +10,12 @@ from pygame.locals import *
 def main():
 
     pygame.init()
+    acabado = False
 
     # coords iniciales
     coordX_pala = 300
     coordY_pala = 600
+    incX = 0
     
     coordX_rojo = 370
     coordY_rojo = 60
@@ -30,7 +32,7 @@ def main():
     coords_verde2 = (coordX_verde2, coordY_verde2)
     
     # puntuación actual
-    puntuacion = '0'
+    puntuacion = 0
 	
 	# objeto reloj
     Reloj= pygame.time.Clock()
@@ -42,11 +44,12 @@ def main():
     # establecemos la fuente y renderizamos la palabra "puntuación"
     fuente= pygame.font.Font(None, 30)
     msj_puntuacion = fuente.render("PUNTUACION", 1, (255,255,255))
-    valor_puntuacion = fuente.render(puntuacion, 1, (255,255,255))
+    valor_puntuacion = fuente.render(str(puntuacion), 1, (255,255,255))
 
 	# cargamos las imagenes
     marcador = pygame.image.load("marcador.png")
     fondo = pygame.image.load("fondo7.png")
+    game_over = pygame.image.load("game_over.jpg")
     
     imagen_pala = pygame.image.load("pala.png")
     transparente = imagen_pala.get_at((0, 0))
@@ -103,6 +106,8 @@ def main():
         Ventana.blit(cubo_azul.image, cubo_azul.rect)
         Ventana.blit(cubo_verde.image, cubo_verde.rect)
         Ventana.blit(cubo_verde2.image, cubo_verde2.rect)
+        if acabado:
+			Ventana.blit(game_over, (0, 0))	
         
 		# visualizamos
         pygame.display.flip()
@@ -115,37 +120,74 @@ def main():
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_ESCAPE:
                     sys.exit()
-                if evento.key == pygame.K_RIGHT:
-					if coordX_pala < 600:
-						coordX_pala = coordX_pala + 40
-                if evento.key == pygame.K_LEFT:
-					if coordX_pala > 60:
-						coordX_pala = coordX_pala - 40
-
-            # Si el evento es una pulsación de ratón...
-            #elif evento.type == MOUSEBUTTONDOWN:
-            
-            # seleccionamos las nuevas coordenadas
-            coordenadas_pala = (coordX_pala, coordY_pala)                        
-            coords_rojo = (coordX_rojo, coordY_rojo)
-            coords_azul = (coordX_azul, coordY_azul)            
-            coords_verde = (coordX_verde, coordY_verde)
-            coords_verde2 = (coordX_verde2, coordY_verde2)
+                elif evento.key == pygame.K_RIGHT:
+						incX = 40
+                elif evento.key == pygame.K_LEFT:
+						incX = -40
+            if evento.type == pygame.KEYUP:				
+				incX = 0
+										    
+        # seleccionamos las nuevas coordenadas
+        if coordX_pala +incX > 25 and coordX_pala +incX <650:
+			coordX_pala = coordX_pala + incX
+        coordenadas_pala = (coordX_pala, coordY_pala)
+        coords_rojo = (coordX_rojo, coordY_rojo)
+        coords_azul = (coordX_azul, coordY_azul)
+        coords_verde = (coordX_verde, coordY_verde)
+        coords_verde2 = (coordX_verde2, coordY_verde2)
+		
+		
+        print incX
 
 		# incrementos
-        coordY_rojo = coordY_rojo +8
-        coordY_azul = coordY_azul +17
-        coordY_verde = coordY_verde + 13
-        coordY_verde2 = coordY_verde2 + 23
-        
-        # seleccionamos las nuevas coordenadas                                  
+		
+        if coordY_rojo < 610:
+			coordY_rojo = coordY_rojo +8
+        else:
+			coordY_rojo = 60
+        if coordY_azul < 601:
+			coordY_azul = coordY_azul +17
+        else:
+			coordY_azul = 60
+        if coordY_verde < 605:
+			coordY_verde = coordY_verde + 13
+        else:
+			coordY_verde = 60
+        if coordY_verde2 < 595:
+			coordY_verde2 = coordY_verde2 + 23
+        else:
+			coordY_verde2 = 60
+                        
+		# colisiones		
+        if pygame.sprite.collide_rect(miPala, cubo_rojo):
+			acabado = True
+			puntuacion = 0
+			
+        if pygame.sprite.collide_rect(miPala, cubo_azul):
+			puntuacion = puntuacion - 10
+			coordY_azul = 60
+			
+        if pygame.sprite.collide_rect(miPala, cubo_verde):
+			puntuacion = puntuacion + 10
+			coordY_verde = 60
+			cubo_verde.resetearCoords()
+			
+        if pygame.sprite.collide_rect(miPala, cubo_verde2):
+			puntuacion = puntuacion + 10
+			coordY_verde2 = 60
+			cubo_verde.resetearCoords()
+			
+		# seleccionamos las nuevas coordenadas                                  
         coords_rojo = (coordX_rojo, coordY_rojo)
         coords_azul = (coordX_azul, coordY_azul)            
         coords_verde = (coordX_verde, coordY_verde)
-        coords_verde2 = (coordX_verde2, coordY_verde2)         
-            
+        coords_verde2 = (coordX_verde2, coordY_verde2) 	
+		
+        print puntuacion
+        valor_puntuacion = fuente.render(str(puntuacion), 1, (255,255,255))
+		            
         # esperamos
-        Reloj.tick(10)
+        Reloj.tick(20)
 
 
 class Pala(pygame.sprite.Sprite):
@@ -177,6 +219,9 @@ class Cubo(pygame.sprite.Sprite):
         self.rect.center = nuevas_coordenadas
         if self.actualizado + 50 < pygame.time.get_ticks():            
             self.actualizado= pygame.time.get_ticks()
+            
+    def resetearCoords(self):
+		print "1"            
 
 # ejecutamos el juego
 main()
