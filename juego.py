@@ -11,6 +11,8 @@ def main():
 
     pygame.init()
     acabado = False
+    ranking = False
+    nombre = ""
 
     # coords iniciales
     coordX_pala = 300
@@ -34,6 +36,8 @@ def main():
     # puntuación actual
     puntuacion = 0
 	
+    tiempo = 30
+	
 	# objeto reloj
     Reloj= pygame.time.Clock()
 
@@ -45,6 +49,12 @@ def main():
     fuente= pygame.font.Font(None, 30)
     msj_puntuacion = fuente.render("PUNTUACION", 1, (255,255,255))
     valor_puntuacion = fuente.render(str(puntuacion), 1, (255,255,255))
+    tiempo_restante = fuente.render(str(tiempo), 1, (255,255,255))
+    
+    msj_pedir_nombre = fuente.render("Introduce tu nombre:", 1, (255,255,255))
+    msj_nombre = fuente.render("", 1, (255,255,255))
+    msj_marcador = fuente.render("MARCADOR", 1, (255,255,255))
+
 
 	# cargamos las imagenes
     marcador = pygame.image.load("marcador.png")
@@ -101,13 +111,21 @@ def main():
         Ventana.blit(fondo, (14, 14))
         Ventana.blit(msj_puntuacion, (700, 28))
         Ventana.blit(valor_puntuacion, (755, 65))
+        Ventana.blit(tiempo_restante, (755, 95))
         Ventana.blit(miPala.image, miPala.rect)
         Ventana.blit(cubo_rojo.image, cubo_rojo.rect)
         Ventana.blit(cubo_azul.image, cubo_azul.rect)
         Ventana.blit(cubo_verde.image, cubo_verde.rect)
         Ventana.blit(cubo_verde2.image, cubo_verde2.rect)
         if acabado:
-			Ventana.blit(game_over, (0, 0))	
+			Ventana.blit(game_over, (0, 0))
+			Ventana.blit(msj_pedir_nombre, (130, 460))
+			Ventana.blit(msj_nombre, (355, 460))
+        if ranking:
+			Ventana.fill((0, 0, 0))
+			Ventana.blit(msj_marcador, (355, 100))
+			Ventana.blit(msj_nombre, (205, 460))
+			Ventana.blit(valor_puntuacion, (555, 460))
         
 		# visualizamos
         pygame.display.flip()
@@ -118,14 +136,23 @@ def main():
             if evento.type == QUIT:
                 sys.exit()
             if evento.type == pygame.KEYDOWN:
+                if acabado:
+                    letra = chr(evento.key)
+                    nombre = nombre + letra
+                    msj_nombre = fuente.render(nombre, 1, (255,255,255))
+                    print letra
+                    if evento.key == pygame.K_RETURN:
+						acabado = False
+						ranking = True
                 if evento.key == pygame.K_ESCAPE:
                     sys.exit()
                 elif evento.key == pygame.K_RIGHT:
-						incX = 40
-                elif evento.key == pygame.K_LEFT:
-						incX = -40
+						incX = 30
+                elif evento.key == pygame.K_LEFT:					
+						incX = -30
             if evento.type == pygame.KEYUP:				
 				incX = 0
+				
 										    
         # seleccionamos las nuevas coordenadas
         if coordX_pala +incX > 25 and coordX_pala +incX <650:
@@ -164,7 +191,7 @@ def main():
 			puntuacion = 0
 			
         if pygame.sprite.collide_rect(miPala, cubo_azul):
-			puntuacion = puntuacion - 10
+			puntuacion = puntuacion - 30
 			coordY_azul = 60
 			
         if pygame.sprite.collide_rect(miPala, cubo_verde):
@@ -183,8 +210,14 @@ def main():
         coords_verde = (coordX_verde, coordY_verde)
         coords_verde2 = (coordX_verde2, coordY_verde2) 	
 		
-        print puntuacion
+		# timepo
+        segundos = pygame.time.get_ticks()/1000
+        tiempo = 30 - segundos
         valor_puntuacion = fuente.render(str(puntuacion), 1, (255,255,255))
+        tiempo_restante = fuente.render(str(tiempo), 1, (255,255,255))
+		
+        if tiempo == 0:
+			acabado = True
 		            
         # esperamos
         Reloj.tick(20)
