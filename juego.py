@@ -130,37 +130,39 @@ def main():
                 sys.exit()
             if evento.type == pygame.KEYDOWN:
                 if acabado:
-                    letra = chr(evento.key)
-                    nombre = nombre + letra
-                    msj_nombre = fuente.render(nombre, 1, (255,255,255))
-                    print letra
-                    if evento.key == pygame.K_RETURN:
-						acabado = False
-						ranking = True
+					if evento.key == pygame.K_RETURN:
+						    acabado = False
+						    ranking = True
+					if evento.key > 31 and evento.key < 123:															
+						letra = chr(evento.key)
+						nombre = nombre + letra
+						msj_nombre = fuente.render(nombre, 1, (255,255,255))
+						print letra
+                    
                 if evento.key == pygame.K_ESCAPE:
                     sys.exit()
                 elif evento.key == pygame.K_RIGHT:
-						incX = 30
+						incX = 35
                 elif evento.key == pygame.K_LEFT:					
-						incX = -30
+						incX = -35
             if evento.type == pygame.KEYUP:				
 				incX = 0
 	
 		# incrementos
         if coordY_rojo < 610:
-			coordY_rojo = coordY_rojo +8
+			coordY_rojo = coordY_rojo +10
         else:
 			coordY_rojo = 60
         if coordY_azul < 601:
-			coordY_azul = coordY_azul +17
+			coordY_azul = coordY_azul +19
         else:
 			coordY_azul = 60
         if coordY_verde < 605:
-			coordY_verde = coordY_verde + 13
+			coordY_verde = coordY_verde + 15
         else:
 			coordY_verde = 60
         if coordY_verde2 < 595:
-			coordY_verde2 = coordY_verde2 + 23
+			coordY_verde2 = coordY_verde2 + 25
         else:
 			coordY_verde2 = 60
                         
@@ -201,7 +203,7 @@ def main():
 			acabado = True
 		            
         # esperamos
-        Reloj.tick(20)
+        Reloj.tick(25)
 
 
 class Pala(pygame.sprite.Sprite):
