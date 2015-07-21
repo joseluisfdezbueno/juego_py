@@ -184,7 +184,7 @@ def main():
 	        coordY_verde2 = 60
 	        		
 		# seleccionamos las nuevas coordenadas
-        if coordX_pala +incX > 25 and coordX_pala +incX <650:
+        if coordX_pala +incX > 35 and coordX_pala +incX <632:
 			coordX_pala = coordX_pala + incX
         coordenadas_pala = (coordX_pala, coordY_pala)
         coords_rojo = (coordX_rojo, coordY_rojo)
