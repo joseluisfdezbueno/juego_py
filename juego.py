@@ -13,12 +13,13 @@ def main():
     acabado = False
     ranking = False
     nombre = ""
-
-    # coords iniciales
-    coordX_pala = 300
-    coordY_pala = 600
+    puntuacion = 0	
+    tiempo = 30
     incX = 0
     
+    # coords iniciales
+    coordX_pala = 300
+    coordY_pala = 600    
     coordX_rojo = 370
     coordY_rojo = 60
     coordX_azul = 240
@@ -32,11 +33,6 @@ def main():
     coords_azul = (coordX_azul, coordY_azul)            
     coords_verde = (coordX_verde, coordY_verde)
     coords_verde2 = (coordX_verde2, coordY_verde2)
-    
-    # puntuación actual
-    puntuacion = 0
-	
-    tiempo = 30
 	
 	# objeto reloj
     Reloj= pygame.time.Clock()
@@ -45,22 +41,20 @@ def main():
     Ventana = pygame.display.set_mode((867, 650))
     pygame.display.set_caption("Juego Python")
     
-    # establecemos la fuente y renderizamos la palabra "puntuación"
+    # establecemos la fuente y renderizamos los mensajes que queremos escribir en pantalla"
     fuente= pygame.font.Font(None, 30)
     msj_puntuacion = fuente.render("PUNTUACION", 1, (255,255,255))
     valor_puntuacion = fuente.render(str(puntuacion), 1, (255,255,255))
     tiempo_restante = fuente.render(str(tiempo), 1, (255,255,255))
-    
     msj_pedir_nombre = fuente.render("Introduce tu nombre:", 1, (255,255,255))
     msj_nombre = fuente.render("", 1, (255,255,255))
     msj_marcador = fuente.render("MARCADOR", 1, (255,255,255))
-
 
 	# cargamos las imagenes
     marcador = pygame.image.load("marcador.png")
     fondo = pygame.image.load("fondo7.png")
     game_over = pygame.image.load("game_over.jpg")
-    
+        
     imagen_pala = pygame.image.load("pala.png")
     transparente = imagen_pala.get_at((0, 0))
     imagen_pala.set_colorkey(transparente)
@@ -77,8 +71,7 @@ def main():
     imagen_cubo_verde = pygame.image.load("cubo_verde.png")
     transparente = imagen_cubo_verde.get_at((0, 0))
     imagen_cubo_verde.set_colorkey(transparente)
-    
-    
+        
     # cargamos la música de fondo
     Musica = pygame.mixer.Sound("guitarra.wav")
 
@@ -123,9 +116,9 @@ def main():
 			Ventana.blit(msj_nombre, (355, 460))
         if ranking:
 			Ventana.fill((0, 0, 0))
-			Ventana.blit(msj_marcador, (355, 100))
-			Ventana.blit(msj_nombre, (205, 460))
-			Ventana.blit(valor_puntuacion, (555, 460))
+			Ventana.blit(msj_marcador, (355, 130))
+			Ventana.blit(msj_nombre, (205, 300))
+			Ventana.blit(valor_puntuacion, (555, 300))
         
 		# visualizamos
         pygame.display.flip()
@@ -152,22 +145,8 @@ def main():
 						incX = -30
             if evento.type == pygame.KEYUP:				
 				incX = 0
-				
-										    
-        # seleccionamos las nuevas coordenadas
-        if coordX_pala +incX > 25 and coordX_pala +incX <650:
-			coordX_pala = coordX_pala + incX
-        coordenadas_pala = (coordX_pala, coordY_pala)
-        coords_rojo = (coordX_rojo, coordY_rojo)
-        coords_azul = (coordX_azul, coordY_azul)
-        coords_verde = (coordX_verde, coordY_verde)
-        coords_verde2 = (coordX_verde2, coordY_verde2)
-		
-		
-        print incX
-
+	
 		# incrementos
-		
         if coordY_rojo < 610:
 			coordY_rojo = coordY_rojo +8
         else:
@@ -188,34 +167,36 @@ def main():
 		# colisiones		
         if pygame.sprite.collide_rect(miPala, cubo_rojo):
 			acabado = True
-			puntuacion = 0
 			
         if pygame.sprite.collide_rect(miPala, cubo_azul):
-			puntuacion = puntuacion - 30
+			if (acabado == False) and (ranking == False):
+			    puntuacion = puntuacion - 30
 			coordY_azul = 60
 			
         if pygame.sprite.collide_rect(miPala, cubo_verde):
-			puntuacion = puntuacion + 10
+			if (acabado == False) and (ranking == False):			
+			    puntuacion = puntuacion + 10
 			coordY_verde = 60
-			cubo_verde.resetearCoords()
 			
         if pygame.sprite.collide_rect(miPala, cubo_verde2):
-			puntuacion = puntuacion + 10
-			coordY_verde2 = 60
-			cubo_verde.resetearCoords()
-			
-		# seleccionamos las nuevas coordenadas                                  
+	        if (acabado == False) and (ranking == False):
+				puntuacion = puntuacion + 10
+	        coordY_verde2 = 60
+	        		
+		# seleccionamos las nuevas coordenadas
+        if coordX_pala +incX > 25 and coordX_pala +incX <650:
+			coordX_pala = coordX_pala + incX
+        coordenadas_pala = (coordX_pala, coordY_pala)
         coords_rojo = (coordX_rojo, coordY_rojo)
         coords_azul = (coordX_azul, coordY_azul)            
         coords_verde = (coordX_verde, coordY_verde)
         coords_verde2 = (coordX_verde2, coordY_verde2) 	
 		
-		# timepo
+		# tiempo
         segundos = pygame.time.get_ticks()/1000
         tiempo = 30 - segundos
         valor_puntuacion = fuente.render(str(puntuacion), 1, (255,255,255))
-        tiempo_restante = fuente.render(str(tiempo), 1, (255,255,255))
-		
+        tiempo_restante = fuente.render(str(tiempo), 1, (255,255,255))		
         if tiempo == 0:
 			acabado = True
 		            
@@ -251,10 +232,7 @@ class Cubo(pygame.sprite.Sprite):
     def update(self, nuevas_coordenadas):
         self.rect.center = nuevas_coordenadas
         if self.actualizado + 50 < pygame.time.get_ticks():            
-            self.actualizado= pygame.time.get_ticks()
-            
-    def resetearCoords(self):
-		print "1"            
+            self.actualizado= pygame.time.get_ticks()           
 
 # ejecutamos el juego
 main()
